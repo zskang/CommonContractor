@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-lazy-init="true">
+
+	<description>系统配置信息</description>
+		<!-- 系统操作日志实体 -->
+	<bean id="actionLoggerEntity"
+		class="com.cabletech.business.entity.actionlog.ActionLoggerEntity">
+	</bean>
+	<bean id="afterlog"
+		class="com.cabletech.common.interceptor.ActionLogInterceptor">
+		<property name="InterceptorMethod">
+			<list>
+				<map>
+					<entry key="method">
+						<value>delete</value>
+					</entry>
+					<entry key="cnname">
+						<value>删除记录</value>
+					</entry>
+				</map>
+				<map>
+					<entry key="method">
+						<value>update</value>
+					</entry>
+					<entry key="cnname">
+						<value>更新记录</value>
+					</entry>
+				</map>
+
+			</list>
+		</property>
+	</bean>
+	<bean
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*Mapper</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>afterlog</value>
+			</list>
+		</property>
+	</bean>
+
+	
+	<!-- 系统初始化需要配置的信息，可扩展 -->
+	<bean id="config" class="com.cabletech.common.config.InitConfig">
+		<property name="uploadroot" value="${webapp.upload.root}" />
+		<!-- 对Excel操作配置 -->
+		<property name="exceltemplate" value="${webapp.excel.template}" />
+		<property name="excelpropertiesfile" value="${webapp.excel.propertiesfile}" />
+		
+		<!-- 配置系统的绝对路径 -->
+		<property name="absolutepath" value="WebApp.root" />
+		
+		
+	</bean>
+
+</beans>

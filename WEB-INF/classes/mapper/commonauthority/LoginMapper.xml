@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cabletech.business.mapper.commonauthority.LoginMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 查询用户数据 -->
+	<select id="loginOn" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		select u.id,u.userid,u.username,u.orgid,o.organizename,o.orgtype
+		from
+		base_user u left join base_Organize o on u.orgid=o.id where u.state is
+		null and
+		u.userid=#{username}
+		<if test="password!=null and password!=''">and u.password=#{password}</if>
+
+	</select>
+	<!-- 查询单个登录用户信息 -->
+	<select id="searchOneLoginUser" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity">
+		select u.*,o.organizename orgname,s.realname staffname from
+		base_user u left join base_organize o on u.orgid=o.id left join
+		base_staff s on u.username=s.id where u.userid= #{userid} and u.state
+		is null 
+	</select>
+	<!-- 查询登录用户区域信息 -->
+	<select id="serachRegionForOrgId" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseRegionEntity"
+		flushCache="true">
+		select r.regionname,r.regionid from base_orgregion ro join
+		base_region r on ro.regionid=r.regionid where
+		ro.orgid=#{orgid,jdbcType=VARCHAR}
+	</select>
+	<!-- 查询用户所有角色信息 -->
+	<select id="searchLoginRoleInfo"
+		resultType="com.cabletech.business.entity.commonauthority.BaseRoleEntity">
+		select distinct r.* from base_userrole rg join base_role r
+		on
+		rg.roleid=r.id where rg.userid=#{userid}
+	</select>
+	<!-- 查询全部角色有权访问的顶级菜单数据根据Roleid -->
+	<select id="searchAllMenuForRole" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity">
+		select m.*,(select mp.text from base_menu mp where
+		mp.id=m.parentid)
+		parentname,(select count(1) from base_menu b
+		where b.parentid=m.id)
+		childcount from (select distinct * from
+		base_menu start with id in
+		(select rmp.TARGETID from
+		View_RoleMenuPermission rmp where
+		rmp.RESOURCEID in
+		<foreach collection="ids" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+		)connect by prior parentid=id)m where m.status is null
+		<if test="parentid!=null and parentid!=''">
+			and m.parentid=#{parentid}
+		</if>
+	</select>
+</mapper>

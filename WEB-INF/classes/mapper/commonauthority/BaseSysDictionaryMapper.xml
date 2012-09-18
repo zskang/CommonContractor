@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BaseSysDictionaryMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 查询全部用户数据 -->
+	<select id="searchAllSysDictionary" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseSysDictionaryEntity"
+		flushCache="true">
+		select * from base_sysdictionary where status is null
+		<if test="id!=null and id!=''">and id=#{id}</if>
+		<if test="columntype!=null and columntype!=''">
+			and columntype=#{columntype}
+		</if>
+		<if test="lable!=null and lable!=''">
+			AND lable like
+			'%'||#{lable}||'%'
+		</if>
+	</select>
+
+	<!-- 查询单个用户信息 -->
+	<select id="searchOneSysDictionary" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.BaseSysDictionaryEntity"
+		flushCache="true">
+		select * from base_sysdictionary where id = #{id}
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertSysDictionary"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseSysDictionaryEntity"
+		flushCache="true">
+		insert into base_sysdictionary (id,codevalue, lable,
+		restype, columntype,
+		showvalue, remark)values
+		(#{id},#{codevalue,jdbcType=VARCHAR}, #{lable,jdbcType=VARCHAR},
+		#{restype,jdbcType=VARCHAR}, #{columntype,jdbcType=VARCHAR},
+		#{showvalue,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+	</insert>
+	<!-- 更新数据 -->
+	<update id="updateSysDictionary"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseSysDictionaryEntity"
+		flushCache="true">
+		update base_sysdictionary set
+		codevalue=#{codevalue,jdbcType=VARCHAR}, lable =
+		#{lable,jdbcType=VARCHAR},
+		restype = #{restype,jdbcType=VARCHAR},
+		columntype =
+		#{columntype,jdbcType=VARCHAR}, showvalue =
+		#{showvalue,jdbcType=VARCHAR}, remark =
+		#{remark,jdbcType=VARCHAR}
+		where id = #{id}
+	</update>
+	<!-- 逻辑删除单个字典信息 -->
+	<update id="deleteSysDictionary" parameterType="String"
+		flushCache="true">
+		update base_sysdictionary set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>
+

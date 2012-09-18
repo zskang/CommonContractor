@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BasePermissionScopeMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 获取所有菜单数据 -->
+	<select id="searchAllMenuResource" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity"
+		flushCache="true">
+		select * from (select m.id,m.text,m.parentid,(select mp.text
+		from
+		base_menu mp where mp.id=m.parentid) parentname, (select
+		count(1) from
+		(select b.id,b.text,b.parentid from base_menu b
+		union all select
+		p.id,p.permissionname text,m.id parentid from
+		view_menuresourcepermission mr join base_permissionitem p on
+		mr.TARGETID=p.id join base_menu m on m.id=mr.RESOURCEID) b where
+		b.parentid=m.id) childcount,'Menu' objtype from base_menu m
+		where
+		m.status is null union all select mr.id,p.permissionname
+		text,m.id
+		parentid,m.text parentname,0 childcount,'Resource'
+		objtype from
+		view_menuresourcepermission mr join
+		base_permissionitem p on
+		mr.TARGETID=p.id join base_menu m on
+		m.id=mr.RESOURCEID) where 1=1
+		<if test="parentid!=null and parentid!=''">
+			and parentid=#{parentid}
+		</if>
+	</select>
+	<!-- 查询全部操作 -->
+	<select id="searchAllPermission" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity"
+		flushCache="true">
+		select m.*,(select mp.permissionname from base_permissionitem mp
+		where
+		mp.id=m.parentid) parentname,(select count(1) from
+		base_permissionitem
+		b where b.parentid=m.id) childcount from
+		base_permissionitem m where
+		m.status is null
+		<if test="parentid!=null and parentid!=''">
+			and m.parentid=#{parentid}
+		</if>
+	</select>
+	<!-- 查询全部角色有权访问的顶级菜单数据根据Roleid -->
+	<select id="searchAllMenuForRole" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity">
+		select m.*,(select mp.text from base_menu mp where
+		mp.id=m.parentid)
+		parentname,(select count(1) from base_menu b
+		where b.parentid=m.id)
+		childcount from (select distinct * from
+		base_menu start with id in
+		(select rmp.TARGETID from
+		View_RoleMenuPermission rmp where
+		rmp.RESOURCEID in
+		<foreach collection="ids" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+		)connect by prior parentid=id)m where m.status is null
+		<if test="parentid!=null and parentid!=''">
+			and m.parentid=#{parentid}
+		</if>
+	</select>
+	<!-- 查询角色资源数据根据Roleid -->
+	<select id="searchAllMenuResForRole" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity">
+		select distinct t.*,(select count(1) from (select distinct
+		b.id,b.parentid from base_menu b union all select distinct
+		p.id,m.id
+		parentid from view_menuresourcepermission mr join
+		base_permissionitem p
+		on mr.TARGETID=p.id join base_menu m on
+		m.id=mr.RESOURCEID) b where
+		b.parentid=t.id ) childcount from
+		(select distinct
+		m.id,m.text,m.parentid, 'Menu'
+		objtype,m.hrefurl from base_menu m start
+		with m.id in (select
+		rmp.TARGETID from View_RoleMenuPermission rmp
+		where
+		rmp.RESOURCEID in
+		<foreach collection="ids" item="ids" index='index' open="("
+			separator="," close=")">
+			#{ids}
+		</foreach>
+		)connect by prior parentid=id union all select distinct
+		mr.id,p.permissionname text,m.id parentid, 'Resource' objtype,''
+		hrefurl from view_menuresourcepermission mr join
+		base_permissionitem p
+		on mr.TARGETID=p.id join base_menu m on
+		m.id=mr.RESOURCEID start with
+		mr.id in (select rmp.TARGETID from
+		View_RoleMenuPermission rmp where
+		rmp.RESOURCEID in
+		<foreach collection="rds" item="rds" open="(" separator=","
+			close=")">
+			#{rds}
+		</foreach>
+		) connect by prior parentid=id)t where 1=1
+		<if test="parentid!=null and parentid!=''">
+			and parentid=#{parentid}
+		</if>
+		<if test="objtype!=null and objtype!=''">
+			and objtype=#{objtype}
+		</if>
+	</select>
+	<select id="searchAllPermissionForRole" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity">
+		select m.*,(select mp.permissionname from base_permissionitem mp
+		where
+		mp.id=m.parentid) parentname,(select count(1) from
+		base_permissionitem
+		b where b.parentid=m.id) childcount from
+		(select distinct * from
+		base_permissionitem start with id in
+		(select rmp.permissionid from
+		Base_Permission rmp where
+		rmp.resourcecategory='Role' and
+		rmp.resourceid in
+		<foreach collection="ids" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+		)connect by prior parentid=id)m where 1=1
+		<if test="parentid!=null and parentid!=''">
+			and m.parentid=#{parentid}
+		</if>
+	</select>
+	<!-- 插入角色菜单数据 -->
+	<insert id="insertRoleMenu"
+		parameterType="com.cabletech.business.entity.commonauthority.BasePermissionScopeEntity"
+		flushCache="true">
+		insert into base_permissionscope(id,
+		resourceid,resourcecategory, targetid,
+		targetcategory)values(#{id,jdbcType=VARCHAR},#{resourceid,jdbcType=VARCHAR},#{resourcecategory,jdbcType=VARCHAR},#{targetid,jdbcType=VARCHAR},#{targetcategory,jdbcType=VARCHAR})
+	</insert>
+	<!-- 删除角色菜单数据 -->
+	<delete id="deleteRoleMenu" parameterType="String" flushCache="true">
+		delete from base_permissionscope where resourcecategory='Role'
+		and
+		targetcategory='Menu' and resourceid= #{id}
+	</delete>
+	<!-- 插入角色权限数据 -->
+	<insert id="insertRolePermission"
+		parameterType="com.cabletech.business.entity.commonauthority.BasePermissionEntity"
+		flushCache="true">
+		insert into base_permission (id, resourceid,
+		resourcecategory,
+		permissionid)values (#{id,jdbcType=VARCHAR},
+		#{resourceid,jdbcType=VARCHAR},
+		#{resourcecategory,jdbcType=VARCHAR},
+		#{permissionid,jdbcType=VARCHAR})
+	</insert>
+	<!-- 删除角色菜单数据 -->
+	<delete id="deleteRolePermission" parameterType="String"
+		flushCache="true">
+		delete from base_permission where resourcecategory='Role'
+		and
+		resourceid= #{id}
+	</delete>
+	<!-- 查询所有用户数据 -->
+	<select id="searchAllUser" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		select u.id userid,u.username, u.orgname from
+		view_userinfo u Where 1=1
+		<if test="username!=null and username!=''">
+			AND u.username like '%'||#{username}||'%'
+		</if>
+		<if test="orgid!=null and orgid!=''">
+			and u.orgid in(select id from base_organize start with id=
+			#{orgid} connect by prior id=parentid)
+		</if>
+		<if test="roleid!=null and roleid!=''">
+			and not exists(select 1 from base_userrole ur where
+			u.id=ur.userid and ur.roleid=#{roleid})
+		</if>
+	</select>
+	<!-- 插入角色用户数据 -->
+	<insert id="insertRoleUser"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseUserRoleEntity"
+		flushCache="true">
+		insert into base_userrole (id, userid,
+		roleid)values(#{id,jdbcType=VARCHAR},
+		#{userid,jdbcType=VARCHAR},
+		#{roleid,jdbcType=VARCHAR})
+	</insert>
+	<!-- 删除角色菜单数据 -->
+	<delete id="deleteRoleUser" flushCache="true">
+		delete from base_userrole where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<!-- 根据用户角色查询用户 -->
+	<select id="searchUserForRole" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		select ur.id, u.username,u.orgname,r.rolename staffname from base_userrole ur join
+		view_userinfo u on ur.userid=u.id join base_role r on r.id=ur.roleid where 1=1
+		<if test="roleid!=null and roleid!=''">
+			and ur.roleid=#{roleid}
+		</if>
+		<if test="username!=null and username!=''">
+			AND u.username like '%'||#{username}||'%'
+		</if>
+		<if test="orgid!=null and orgid!=''">
+		        AND EXISTS( SELECT vuo.ID FROM VIEW_ORG vuo WHERE
+				vuo.ID= u.orgid START WITH
+				vuo.ID= #{orgid} CONNECT BY PRIOR
+				vuo.ID=vuo.PARENTID )
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BasePermissionItemMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<select id="searchAllPermissionItem" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity"
+		flushCache="true">
+		select m.*,(select mp.permissionname from base_permissionitem mp
+		where mp.id=m.parentid) parentname,(select count(1) from
+		base_permissionitem b where b.parentid=m.id) childcount from
+		base_permissionitem m where m.status is null
+		<if test="parentid!=null and parentid!=''">
+			and m.parentid=#{parentid}
+		</if>
+	</select>
+
+	<!-- 查询全部资源数据 -->
+	<select id="searchAllResourceInfo" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity"
+		flushCache="true">
+		select * from base_permissionitem where status is null
+		<if test="permissionname!=null and permissionname!=''">
+		 and permissionname like '%'||#{permissionname}||'%'
+		</if>
+	</select>
+	<!-- 插入数据 -->
+	<insert id="insertOneResourceInfo"
+		parameterType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity"
+		flushCache="true">
+		insert into base_permissionitem(id, permissionname, remark,
+		permissioncode,parentid) values (#{id},
+		#{permissionname,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR},
+		#{permissioncode,jdbcType=VARCHAR},#{parentid,jdbcType=VARCHAR})
+	</insert>
+	<!-- 更新数据 -->
+	<update id="updateResourceInfo"
+		parameterType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity"
+		flushCache="true">
+		update base_permissionitem set permissionname =
+		#{permissionname,jdbcType=VARCHAR},remark =
+		#{remark,jdbcType=VARCHAR}, permissioncode =
+		#{permissioncode,jdbcType=VARCHAR},parentid =
+		#{parentid,jdbcType=VARCHAR} where id = #{id}
+	</update>
+	<!-- 删除数据 -->
+	<update id="deleteResourceInfo" flushCache="true">
+		update base_permissionitem set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+	<!-- 查询单个资源信息 -->
+	<select id="searchOneResourceInfo" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.BasePermissionItemEntity">
+		select * from base_permissionitem where id = #{id}
+	</select>
+
+</mapper>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BaseOrgRelMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 查询全部组织用户关系 -->
+	<select id="searchAllOrgUser" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseOrgRelEntity">
+		select ou.*,(select t.name from VIEW_ORGUSER t where
+		t.id=ou.parentid) parentname,(select count(1) from VIEW_ORGUSER
+		b where b.parentid=ou.id) childcount from VIEW_ORGUSER ou where
+		1=1
+		<if test="parentid!=null and parentid!=''">
+			and ou.parentid=#{parentid}
+		</if>
+		<if test="objtype!=null and objtype!=''">
+			and ou.objtype=#{objtype}
+		</if>
+		<if test="orgtype!=null and orgtype!=''">
+			and ou.orgtype=#{orgtype}
+		</if>
+		<if test="regionid!=null and regionid!=''">
+			and ou.regionid in(select regionid from base_region start
+			with regionid= #{regionid} connect by prior
+			regionid=parentid)
+		</if>
+	</select>
+
+	<!-- 查询全部组织部门人员关系-->
+	<select id="searchAllOrgDeptStaff" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseOrgRelEntity">
+		select ou.*,(select t.name from view_orgdeptstaff t where
+		t.id=ou.parentid) parentname,(select count(1) from
+		view_orgdeptstaff b where b.parentid=ou.id and b.lv&lt;=#{lv})
+		childcount from view_orgdeptstaff ou where lv&lt;=#{lv}
+		<if test="orgtype!=null and orgtype!=''">
+			and ou.orgtype=#{orgtype}
+		</if>
+		<if test="regionid!=null and regionid!=''">
+			and ou.regionid in(select regionid from base_region start
+			with regionid= #{regionid} connect by prior
+			regionid=parentid)
+		</if>
+	   <if test="id!=null and id!=''">
+			and ou.id!=#{id} 
+		</if>
+		order by ou.regionid,ou.lv
+	</select>
+
+</mapper>

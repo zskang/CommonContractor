@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cabletech.business.mapper.commonauthority.BaseUserMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 查询用户登陆信息 -->
+	<select id="searchUserlogin" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		select u.id,u.userid,p.name
+		username,u.password,u.phone,o.organizename orgname,u.orgid from base_user u
+		left join base_person p on u.username=p.id left join
+		base_organize o on
+		p.contractorid =o.id where u.state is null and u.userid = #{userid}
+		and
+		u.password=#{password}
+	</select>
+	<!-- 查询用户所有角色信息 -->
+	<select id="searchLoginUserRole"
+		resultType="com.cabletech.business.entity.commonauthority.BaseRoleEntity">
+		select distinct r.* from base_userrole ur join base_role r
+		on
+		ur.roleid=r.id where r.status is null and ur.userid=#{userid}
+	</select>
+	<!-- 查询全部用户数据 -->
+	<select id="searchAllUserInfo" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		select u.*,o.organizename orgname,s.name staffname from
+		base_user u left join
+		base_person s on u.username=s.id
+		left join base_organize o on s.contractorid=o.id
+		where u.state is null and u.id!='sys'
+		<if test="orgid!=null and orgid!=''">
+			and s.contractorid in(select id from base_organize start
+			with id=
+			#{orgid} connect by prior id=parentid)
+			</if>
+		<if test="username!=null and username!=''">
+			AND s.name like '%'||#{username}||'%'
+			</if>
+	</select>
+	<!-- 插入数据 -->
+	<insert id="insertOneUserInfo"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		insert into
+		base_user(id,userid,username,password,phone,email,orgid)
+		values(#{id},#{userid,jdbcType=VARCHAR},#{username,jdbcType=VARCHAR},#{password,jdbcType=VARCHAR},#{phone,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},#{orgid,jdbcType=VARCHAR})
+	</insert>
+
+	<!-- 插入人员基本信息 add wangjie 2011-11-08 -->
+	<insert id="insertPersonInfo"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		INSERT INTO BASE_PERSON(ID,NAME,CONTRACTORID)
+		values(
+		#{id,jdbcType=VARCHAR},
+		#{staffname,jdbcType=VARCHAR},
+		#{orgid,jdbcType=VARCHAR}
+		)
+	</insert>
+	<!-- 更新数据 mod by wnagjie 2011-11-08 按照陈 的意见只 修改密码 -->
+	<update id="updateUserInfo"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseUserEntity"
+		flushCache="true">
+		update base_user set
+		password=#{password,jdbcType=VARCHAR}
+		where id=#{id}
+	</update>
+
+	<!-- 更新数据 mod by wangjie 2011-11-09 注释 <update id="updateUserInfo" parameterType="com.cabletech.business.entity.commonauthority.BaseUserEntity" 
+		flushCache="true"> update base_user set userid=#{userid,jdbcType=VARCHAR},username=#{username,jdbcType=VARCHAR},password=#{password,jdbcType=VARCHAR},phone=#{phone,jdbcType=VARCHAR},email=#{email,jdbcType=VARCHAR},orgid=#{orgid,jdbcType=VARCHAR} 
+		where id=#{id} </update> -->
+
+	<update id="deleteUserInfo" flushCache="true">
+		update base_user u set state='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+	<!-- 查询单个用户信息 -->
+	<select id="searchOneUserInfo" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.BaseUserEntity">
+		select u.*,o.organizename orgname,s.name staffname from
+		base_user u left join
+		base_person s on u.username=s.id left join
+		base_organize o on s.contractorid=o.id where u.id= #{id}
+	</select>
+
+	<!-- 更新当前登录用户信息 -->
+
+	<update id="updateOnloadInfo" parameterType="hashmap"
+		flushCache="true">
+		update base_user u set
+		u.lastlogintime=sysdate,u.lastloginip=#{ip},u.logintimes=u.logintimes+1
+		where id=#{id}
+	</update>
+
+	<!-- 查询人员信息 -->
+	<select id="searchStaffForOrg" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.DeptmentPersonEntity">
+		select s.*,d.deptname,o.organizename as parentname from base_staff s
+		left join base_deptment d on s.deptid=d.id
+		left join base_organize o on
+		s.ORGID=o.id
+		where not exists(select 1 from base_user
+		where
+		username=s.id) 
+		<if test="orgid!=null and orgid!=''"><!--and s.orgid =#{orgid}-->
+		    AND EXISTS( SELECT vuo.ID FROM VIEW_ORG vuo WHERE
+			vuo.ID= o.id START WITH
+			vuo.ID= #{orgid}  CONNECT BY PRIOR
+			vuo.ID=vuo.PARENTID )
+		</if>
+	</select>
+</mapper>

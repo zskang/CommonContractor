@@ -1,0 +1,284 @@
+@CHARSET "UTF-8";
+.folder_wrenchIcon {
+    background-image:url(../images/folder_wrench.png) !important;
+ }
+
+.folder_cameraIcon {
+    background-image:url(../images/folder_camera.png) !important;
+ }
+ 
+.folder_userIcon {
+    background-image:url(../images/folder_user.png) !important;
+ }
+
+.folder_feedIcon {
+    background-image:url(../images/folder_feed.png) !important;
+ }
+ 
+.cupIcon {
+    background-image:url(../images/cup.png) !important;
+ }
+ 
+.application_homeIcon {
+    background-image:url(../images/application_home.png) !important;
+ }
+
+.groupIcon {
+    background-image:url(../images/group.png) !important;
+ }
+ 
+.commentsIcon {
+    background-image:url(../images/comments.png) !important;
+ }
+
+.applicationIcon {
+    background-image:url(../images/application.png) !important;
+ }
+ 
+.application_doubleIcon {
+    background-image:url(../images/application_double.png) !important;
+ }
+ 
+.application_cascadeIcon {
+    background-image:url(../images/application_cascade.png) !important;
+ }
+ 
+.tbar_synchronizeIcon {
+    background-image:url(../images/tbar_synchronize.png) !important;
+ }
+ 
+.comments_addIcon {
+    background-image:url(../images/comments_add.png) !important;
+ }
+ 
+.page_addIcon {
+    background-image:url(../images/page_add.png) !important;
+ }
+ 
+.page_edit_1Icon {
+    background-image:url(../images/page_edit_1.png) !important;
+ }
+ 
+.page_delIcon {
+    background-image:url(../images/page_del.png) !important;
+ }
+
+.page_refreshIcon {
+    background-image:url(../images/page_refresh.png) !important;
+ }
+ 
+.comment_addIcon {
+    background-image:url(../images/comment_add.png) !important;
+ }
+
+.acceptIcon {
+    background-image:url(../images/accept.png) !important;
+ }
+ 
+.deleteIcon {
+    background-image:url(../images/delete.png) !important;
+ }
+
+.status_awayIcon {
+    background-image:url(../images/status_away.png) !important;
+ }
+ 
+.status_busyIcon {
+    background-image:url(../images/status_busy.png) !important;
+ }
+ 
+.arrow_refreshIcon {
+    background-image:url(../images/arrow_refresh.png) !important;
+ }
+ 
+.lockIcon {
+    background-image:url(../images/lock.png) !important;
+ }
+ 
+.wrenchIcon {
+    background-image:url(../images/wrench.png) !important;
+ }
+ 
+.book_previousIcon {
+    background-image:url(../images/book_previous.png) !important;
+ }
+ 
+.window_caise_listIcon {
+    background-image:url(../images/window_caise_list.png) !important;
+ }
+ 
+.imagesIcon {
+    background-image:url(../images/images.png) !important;
+ }
+ 
+.application_view_listIcon {
+    background-image:url(../images/application_view_list.png) !important;
+ }
+ 
+.keyIcon {
+    background-image:url(../images/key.png) !important;
+ }
+ 
+.page_findIcon {
+    background-image:url(../images/page_find.png) !important;
+ }
+ 
+.layout_contentIcon {
+    background-image:url(../images/layout_content.png) !important;
+ }
+ 
+.chart_organisationIcon {
+    background-image:url(../images/chart_organisation.png) !important;
+ }
+
+.buildingIcon {
+    background-image:url(../images/building.png) !important;
+ }
+ 
+.user_femaleIcon {
+    background-image:url(../images/user_female.png) !important;
+ }
+ 
+.status_onlineIcon {
+    background-image:url(../images/status_online.png) !important;
+ }
+ 
+.expand-allIcon {
+    background-image:url(../images/expand-all.gif) !important;
+ }
+ 
+.collapse-allIcon {
+    background-image:url(../images/collapse-all.gif) !important;
+ }
+ 
+.drinkIcon {
+    background-image:url(../images/drink.png) !important;
+ }
+ 
+.userIcon {
+    background-image:url(../images/user.png) !important;
+ }
+ 
+.group_linkIcon {
+    background-image:url(../images/group_link.png) !important;
+ }
+ 
+.award_star_silver_3Icon {
+    background-image:url(../images/award_star_silver_3.png) !important;
+ }
+ 
+.medal_silver_3Icon {
+    background-image:url(../images/medal_silver_3.png) !important;
+ }
+ 
+.medal_gold_1Icon {
+    background-image:url(../images/medal_gold_1.png) !important;
+ }
+ 
+.cancel_48Icon {
+    background-image:url(../images/cancel_48.png) !important;
+ }
+ 
+.themeIcon {
+    background-image:url(../images/theme.png) !important;
+ }
+ 
+.config2Icon {
+    background-image:url(../images/config2.png) !important;
+ }
+ 
+.imIcon {
+    background-image:url(../images/im.png) !important;
+ }
+ 
+.theme2Icon {
+    background-image:url(../images/theme2.png) !important;
+ }
+ 
+.checkIcon {
+    background-image:url(../images/check.png) !important;
+ }
+
+.printerIcon {
+    background-image:url(../images/printer.png) !important;
+ }
+ 
+.previewIcon {
+    background-image:url(../images/preview.png) !important;
+ }
+ 
+.page_excelIcon {
+    background-image:url(../images/page_excel.png) !important;
+ }
+ 
+.pluginIcon {
+    background-image:url(../images/plugin.png) !important;
+ }
+ 
+.addIcon {
+    background-image:url(../images/add.png) !important;
+ }
+ 
+.edit1Icon {
+    background-image:url(../images/edit1.png) !important;
+ }
+ 
+.disconnectIcon {
+    background-image:url(../images/disconnect.png) !important;
+ }
+ 
+.tableIcon {
+    background-image:url(../images/table.png) !important;
+ }
+ 
+.database_connectIcon {
+    background-image:url(../images/database_connect.png) !important;
+ }
+ 
+.exclamationIcon {
+    background-image:url(../images/exclamation.png) !important;
+ }
+
+.bugIcon {
+    background-image:url(../images/bug.png) !important;
+ }
+ 
+.configIcon {
+    background-image:url(../images/config.png) !important;
+ }
+ 
+.server_connectIcon {
+    background-image:url(../images/server_connect.png) !important;
+ }
+ 
+.database_refreshIcon {
+    background-image:url(../images/database_refresh.png) !important;
+ }
+ 
+.user_commentIcon {
+    background-image:url(../images/user_comment.png) !important;
+ }
+ 
+.imagessIcon {
+    background-image:url(../images/imagess.png) !important;
+ }
+ 
+.docsIcon {
+    background-image:url(../images/docs.gif) !important;
+ }
+ 
+.group_addIcon {
+    background-image:url(../images/group_add.png) !important;
+ }
+ 
+.message_editIcon {
+    background-image:url(../images/message_edit.png) !important;
+ }
+ 
+.uploadIcon {
+    background-image:url(../images/upload.png) !important;
+ }
+
+.downloadIcon {
+    background-image:url(../images/download.png) !important;
+ }

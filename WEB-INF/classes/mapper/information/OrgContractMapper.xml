@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.information.OrgContractMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	-->
+
+	<!-- 查询全部合同信息 -->
+	<select id="searchAllOrgContract" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.OrgContractEntity"
+		flushCache="true">
+			select t.*,o1.organizename as orgname,o2.organizename as signorgname,s.lable as contracttypename from orgcontract t
+			left join base_organize o1 on t.orgid = o1.id
+			left join base_organize o2 on t.signorgid = o2.id
+			left join base_sysdictionary s on t.contracttype = s.id
+			where t.status is null 
+		    <if test="contractname!=null and contractname!=''">
+			     AND t.contractname like '%'||#{contractname}||'%'
+		    </if>
+	</select>
+
+	<!-- 查询单个合同信息 -->
+	<select id="searchOneOrgContract" parameterType="String"
+		resultType="com.cabletech.business.entity.information.OrgContractEntity"
+		flushCache="true">
+			select t.* from orgcontract t
+			where t.status is null and t.id = #{id}
+	</select>
+
+	<!-- 插入合同信息 -->
+	<insert id="insertOrgContract"
+		parameterType="com.cabletech.business.entity.information.OrgContractEntity"
+		flushCache="true">
+			insert into orgcontract(id,orgid,signorgid,contractname,contracttype,signdate,signaddress,contractfee,contractlife,signera,tela,signerb,telb,remark) 
+			values(#{id,jdbcType=VARCHAR},
+			#{orgid,jdbcType=VARCHAR},
+			#{signorgid,jdbcType=VARCHAR},
+			#{contractname,jdbcType=VARCHAR},
+			#{contracttype,jdbcType=DATE},
+			#{signdate,jdbcType=DATE},
+			#{signaddress,jdbcType=VARCHAR},
+			#{contractfee,jdbcType=DOUBLE},
+			#{contractlife,jdbcType=VARCHAR},
+			#{signera,jdbcType=VARCHAR},
+			#{tela,jdbcType=VARCHAR},
+			#{signerb,jdbcType=VARCHAR},
+			#{telb,jdbcType=VARCHAR},
+			#{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 更新合同信息 -->
+	<update id="updateOrgContract"
+		parameterType="com.cabletech.business.entity.information.OrgContractEntity"
+		flushCache="true">
+		update orgcontract set
+		orgid=#{orgid,jdbcType=VARCHAR},
+		signorgid=#{signorgid,jdbcType=VARCHAR},
+		contractname=#{contractname,jdbcType=VARCHAR},
+		contracttype=#{contracttype,jdbcType=DATE},
+		signdate=#{signdate,jdbcType=DATE},
+		signaddress=#{signaddress,jdbcType=VARCHAR},
+		contractfee=#{contractfee,jdbcType=DOUBLE},
+		contractlife=#{contractlife,jdbcType=VARCHAR},
+		signera=#{signera,jdbcType=VARCHAR},
+		tela=#{tela,jdbcType=VARCHAR},
+		signerb=#{signerb,jdbcType=VARCHAR},
+		telb=#{telb,jdbcType=VARCHAR},
+		remark=#{remark,jdbcType=VARCHAR}
+		where id=#{id}
+	</update>
+
+	<!-- 逻辑删除合同信息 -->
+	<update id="deleteOrgContract" flushCache="true">
+		update orgcontract set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>

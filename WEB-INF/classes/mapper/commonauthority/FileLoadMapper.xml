@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.FileLoadMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	-->
+
+	<!-- 查询全部上传文件数据 -->
+	<select id="searchAllFileLoad" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.FileLoadEntity"
+		flushCache="true">
+		select * from fileload t where state is null
+	</select>
+
+	<!-- 查询单个上传文件组信息 -->
+	<select id="searchOneFileLoad" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.FileLoadEntity"
+		flushCache="true">
+		select * from fileload t where state is null
+		<if test="id!=null and id!=''">id= #{id}</if>
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertFileLoad"
+		parameterType="com.cabletech.business.entity.commonauthority.FileLoadEntity"
+		flushCache="true">
+		insert into
+		fileload(id, title, path, filesize, filetype,remark)
+		values(#{id},#{title,jdbcType=VARCHAR},#{path,jdbcType=VARCHAR},#{filesize,jdbcType=VARCHAR},#{filetype,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR})
+	</insert>
+
+	<!-- 逻辑删除单个上传文件信息 -->
+	<update id="deleteFileLoad" flushCache="true">
+		update fileload set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>

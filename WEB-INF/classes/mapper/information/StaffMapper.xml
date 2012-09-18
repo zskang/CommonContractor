@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cabletech.business.mapper.information.StaffMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" /> <cache type="org.mybatis.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- 查询全部部门人员数据 -->
+	<select id="searchAllDeptmentPerson" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.DeptmentPersonEntity"
+		flushCache="true">
+		select s.*,o.organizename orgname,d.deptname,(CASE
+		WHEN s.deptid is
+		null THEN 'ORG'
+		ELSE 'DEPT'
+		END ) as orgtype,nvl(s.deptid,s.orgid)
+		parentid,nvl(d.deptname,o.organizename) parentname from base_staff s
+		left join base_organize o on s.orgid=o.id left join base_deptment d on
+		s.deptid=d.id where s.status
+		is null
+		<if test="orgid!=null and orgid!=''">
+			and orgid=#{orgid,jdbcType=VARCHAR}
+		</if>
+		<if test="realname!=null and realname!=''">
+			and realname like '%'||#{realname}||'%'
+		</if>
+	</select>
+	<!-- 查询单个部门人员组详细信息 -->
+	<select id="searchOneDeptmentPerson" parameterType="String"
+		resultType="com.cabletech.business.entity.information.DeptmentPersonEntity"
+		flushCache="true">
+		select s.*,o.organizename orgname,d.deptname,(CASE
+		WHEN
+		s.deptid is null THEN 'ORG'
+		ELSE 'DEPT'
+		END ) as
+		orgtype,nvl(s.deptid,s.orgid)
+		parentid,nvl(d.deptname,o.organizename)
+		parentname from base_staff s
+		left join base_organize o on s.orgid=o.id
+		left join base_deptment d on
+		s.deptid=d.id where
+		s.id=#{id,jdbcType=VARCHAR}
+		and
+		s.status is null
+	</select>
+
+	<!-- 插入部门人员信息 -->
+	<insert id="insertDeptmentPerson"
+		parameterType="com.cabletech.business.entity.information.DeptmentPersonEntity"
+		flushCache="true">
+		insert into base_person (id, deptid, JOBINFO, name, sex,
+		BIRTHDAY, IDENTITYCARD, ACADEMY, GRADUATE_DATE, PHONE,
+		contractorId)values
+		(#{id}, #{deptid,jdbcType=VARCHAR},
+		#{job,jdbcType=VARCHAR},
+		#{realname,jdbcType=VARCHAR},
+		#{sex,jdbcType=VARCHAR},
+		#{birth,jdbcType=DATE},
+		#{cardid,jdbcType=VARCHAR},
+		#{school,jdbcType=VARCHAR},
+		#{graduatedate,jdbcType=DATE},
+		#{tel,jdbcType=VARCHAR},
+		#{orgid,jdbcType=VARCHAR})
+	</insert>
+	<!-- 更新部门人员信息 -->
+	<update id="updateDeptmentPerson"
+		parameterType="com.cabletech.business.entity.information.DeptmentPersonEntity"
+		flushCache="true">
+		update base_person set deptid = #{deptid,jdbcType=VARCHAR},
+		JOBINFO = #{job,jdbcType=VARCHAR}, name =
+		#{realname,jdbcType=VARCHAR}, sex = #{sex,jdbcType=VARCHAR},
+		BIRTHDAY =
+		#{birth,jdbcType=DATE}, IDENTITYCARD = #{cardid,jdbcType=VARCHAR},
+		ACADEMY =
+		#{school,jdbcType=VARCHAR}, GRADUATE_DATE =
+		#{graduatedate,jdbcType=DATE},
+		PHONE =
+		#{tel,jdbcType=VARCHAR},
+		contractorId = #{orgid,jdbcType=VARCHAR} where
+		id=#{id}
+
+	</update>
+	<!-- 逻辑删除单个部门人员信息 -->
+	<delete id="deleteDeptmentPerson" flushCache="true">
+		delete from base_person where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<!-- 查询全部人员证书信息 -->
+	<select id="searchAllPersionCertify" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.PersionCertifyEntity"
+		flushCache="true">
+		select * from persioncertify where status is null
+		<if test="personid!=null and personid!=''">
+			and personid=#{personid}
+		</if>
+	</select>
+	<!-- 插入人员证书信息 -->
+	<insert id="insertPersionCertify"
+		parameterType="com.cabletech.business.entity.information.PersionCertifyEntity"
+		flushCache="true">
+		insert into persioncertify (id, personid, certifyname,
+		certifyid, issue, issuedate, validaity)values (#{id},
+		#{personid},
+		#{certifyname,jdbcType=VARCHAR},
+		#{certifyid,jdbcType=VARCHAR},
+		#{issue,jdbcType=VARCHAR},
+		#{issuedate}, #{validaity,jdbcType=VARCHAR})
+	</insert>
+	<!-- 更新人员证书信息 -->
+	<update id="updatePersionCertify"
+		parameterType="com.cabletech.business.entity.information.PersionCertifyEntity"
+		flushCache="true">
+		update persioncertify set certifyname =
+		#{certifyname,jdbcType=VARCHAR}, certifyid =
+		#{certifyid,jdbcType=VARCHAR}, issue =
+		#{issue,jdbcType=VARCHAR},
+		issuedate = #{issuedate}, validaity =
+		#{validaity} where id = #{id}
+	</update>
+	<!-- 删除人员证书信息 -->
+	<delete id="deletePersionCertify" flushCache="true">
+		delete from persioncertify where personid in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	<!-- 查询全部人员培训信息 -->
+	<select id="searchAllPersonTrain" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.PersonTrainEntity"
+		flushCache="true">
+		select * from persontrain where status is null
+		<if test="personid!=null and personid!=''">
+			and personid=#{personid}
+		</if>
+	</select>
+	<!-- 插入人员培训信息 -->
+	<insert id="insertPersonTrain"
+		parameterType="com.cabletech.business.entity.information.PersonTrainEntity"
+		flushCache="true">
+		insert into persontrain(id, personid, startdate, enddate,
+		trainorg, train, grade, certifyname)values (#{id}, #{personid},
+		#{startdate}, #{enddate}, #{trainorg,jdbcType=VARCHAR},
+		#{train,jdbcType=VARCHAR}, #{grade,jdbcType=VARCHAR},
+		#{certifyname,jdbcType=VARCHAR})
+	</insert>
+	<!-- 更新人员培训信息 -->
+	<update id="updatePersonTrain"
+		parameterType="com.cabletech.business.entity.information.PersonTrainEntity"
+		flushCache="true">
+		update persontrain set startdate = #{startdate}, enddate =
+		#{enddate}, trainorg = #{trainorg,jdbcType=VARCHAR}, train =
+		#{train,jdbcType=VARCHAR}, grade = #{grade,jdbcType=VARCHAR},
+		certifyname = #{certifyname,jdbcType=VARCHAR} where id = #{id}
+	</update>
+	<!-- 删除人员培训信息 -->
+	<delete id="deletePersonTrain" flushCache="true">
+		delete from persontrain where personid in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+</mapper>

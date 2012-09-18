@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.information.PatrolGroupMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	-->
+
+	<!-- 查询全部维护组信息 -->
+	<select id="searchAllPatrolGroup" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.PatrolGroupEntity"
+		flushCache="true">
+			select * from patrolgroup where status is null 
+		    <if test="patrolgroupname!=null and patrolgroupname!=''">
+			     AND patrolgroupname like '%'||#{patrolgroupname}||'%'
+		    </if>
+	</select>
+
+	<!-- 查询单个维护组信息 -->
+	<select id="searchOnePatrolGroup" parameterType="String"
+		resultType="com.cabletech.business.entity.information.PatrolGroupEntity"
+		flushCache="true">
+			select * from patrolgroup where status is null and id = #{id}
+	</select>
+
+	<!-- 插入维护组信息 -->
+	<insert id="insertPatrolGroup"
+		parameterType="com.cabletech.business.entity.information.PatrolGroupEntity"
+		flushCache="true">
+			insert into patrolgroup(id,patrolgroupname,orgid,patrolservice,regionid) 
+			values(#{id},#{patrolgroupname},#{orgid},#{patrolservice},#{regionid})
+	</insert>
+	<!-- 更新维护组信息 -->
+	<update id="updatePatrolGroup"
+		parameterType="com.cabletech.business.entity.information.PatrolGroupEntity"
+		flushCache="true">
+		update patrolgroup set
+		patrolgroupname=#{patrolgroupname,jdbcType=VARCHAR},orgid=#{orgid,jdbcType=VARCHAR},
+		patrolservice=#{patrolservice,jdbcType=VARCHAR},regionid=#{regionid,jdbcType=VARCHAR} 
+		where id=#{id}
+	</update>
+
+	<!-- 逻辑删除维护组信息 -->
+	<update id="deletePatrolGroup" flushCache="true">
+		update patrolgroup set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>

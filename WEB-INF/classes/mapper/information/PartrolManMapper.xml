@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.information.PartrolManMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	-->
+
+
+<!-- 查询未与某一维护组绑定的全部部门人员信息 -->
+	<select id="searchAllDeptmentPersonNoPatrolGroup" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.DeptmentPersonEntity"
+		flushCache="true">
+		select t.*,o.organizename as orgname,d.deptname as deptname from deptmentperson t
+		left join Organize o on t.orgid = o.id
+		left join deptment d on t.deptid = d.id
+		where t.status is null 
+		and   t.id not in (select p.personid from patrolman p where p.patrolgroupid = #{patrolgroupid}) 
+		<if test="realname!=null and realname!=''">
+		and d.realname=#{realname}
+		</if>
+	</select>
+	
+	
+	<!-- 查询某一维护组绑定的全部部门人员信息 -->
+	<select id="searchAllDeptmentPersonByPatrolGroup" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.DeptmentPersonEntity"
+		flushCache="true">
+		select t.*,o.organizename as orgname,d.deptname as deptname from deptmentperson t
+		left join Organize o on t.orgid = o.id
+		left join deptment d on t.deptid = d.id
+        left join patrolman p on t.id = p.personid
+		where t.status is null 
+		<if test="patrolgroupid!=null and patrolgroupid!=''">
+		and p.patrolgroupid = #{patrolgroupid}
+		</if>
+		<if test="realname!=null and realname!=''">
+		and d.realname=#{realname}
+		</if>
+	</select>
+
+
+	<!-- 插入部门人员、维护组信息 -->
+	<insert id="insertPatrolman" parameterType="hashmap">
+	 	insert into patrolman (id, patrolgroupid, personid)
+	 	values(#{id}, #{patrolgroupid,jdbcType=VARCHAR},
+		#{personid,jdbcType=VARCHAR})
+	</insert>
+	
+	
+	<!-- 删除部门人员、维护组信息 -->
+	<delete id="deletePatrolman" parameterType="hashmap">
+		delete patrolman where  patrolgroupid = #{patrolid} 
+		
+		and personid in 
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+	
+</mapper>

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd"
+	default-lazy-init="true">
+
+	<description>Spring公共配置</description>
+	<!-- 使用annotation 自动注册bean,并保证@Required,@Autowired的属性被注入 -->
+	<context:annotation-config />
+	<context:component-scan base-package="*" />
+	<!-- 定义受环境影响易变的变量 -->
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName"
+			value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<!-- 标准配置 -->
+				<value>classpath*:/application.properties</value>
+				<!-- 集群中节点配置
+					<value>classpath*:/application.cluster.properties</value> -->
+				<!-- 本地开发环境配置
+					<value>classpath*:/application.local.properties</value> -->
+				<!-- 服务器生产环境配置 
+					<value>file:/var/springside/application.server.properties</value>-->
+			</list>
+		</property>
+	</bean>
+
+	<!-- 数据源配置,使用应用内的DBCP数据库连接池 -->
+	<bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<property name="initialSize" value="${dbcp.initialSize}" />
+		<property name="maxActive" value="${dbcp.maxActive}" />
+		<property name="maxIdle" value="${dbcp.maxIdle}" />
+		<property name="defaultAutoCommit" value="true" />
+	</bean>
+
+	<!-- 系统操作日志实体 -->
+	<bean id="actionLoggerEntity"
+		class="com.cabletech.business.entity.actionlog.ActionLoggerEntity">
+	</bean>
+
+	<!-- spring 启动JDBC的事务管理 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 创建执行SQL语句的JdbcTemplate -->
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 使用MyBatis创建 -->
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations"
+			value="classpath*:mapper/**/*.xml" />
+	</bean>
+
+	<!-- 拦截器配置  暂时不用该拦截器进行操作拦截
+		<bean id="logger"
+		class="com.cabletech.common.interceptor.SystemActionInterceptor">
+		</bean>
+	-->
+	<bean id="afterlog"
+		class="com.cabletech.common.interceptor.ActionLogInterceptor">
+		<property name="InterceptorMethod">
+			<list>
+				<map>
+					<entry key="method">
+						<value>delete</value>
+					</entry>
+					<entry key="cnname">
+						<value>删除记录</value>
+					</entry>
+				</map>
+				<map>
+					<entry key="method">
+						<value>update</value>
+					</entry>
+					<entry key="cnname">
+						<value>更新记录</value>
+					</entry>
+				</map>
+
+			</list>
+		</property>
+	</bean>
+	<bean
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*Mapper</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>afterlog</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 单个Mapper bean注入 暂时废弃不用 
+		<bean id="userinfoMapper"
+		class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface"
+		value="com.cabletech.commonauthority.mapper.UserInfoMapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		</bean>
+	-->
+	<!--  引入通用Scanner，避免重复书写-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage"
+			value="com.cabletech.business.mapper" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+
+
+	<!--JCaptcha验证码服务 -->
+	<bean id="captchaService"
+		class="com.octo.captcha.service.image.DefaultManageableImageCaptchaService">
+		<property name="captchaEngine">
+			<bean
+				class="org.springside.modules.security.jcaptcha.GMailEngine" />
+		</property>
+		<!-- 
+			默认生成的图片180秒过期 , 可另行设置
+			<property name="minGuarantedStorageDelayInSeconds" value="180" />
+		-->
+	</bean>
+	<import resource="applicationContext-config.xml" />
+</beans>

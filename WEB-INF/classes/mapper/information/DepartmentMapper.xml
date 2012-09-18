@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cabletech.business.mapper.information.DepartmentMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" /> <cache type="org.mybatis.ehcache.LoggingEhcache" 
+		/> -->
+	<!-- 查询全部部门数据 -->
+	<select id="searchAllDepartment" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.DepartmentEntity"
+		flushCache="true">
+		select a.id,a.deptname,a.orgid,a.officer,a.remark,(CASE
+		WHEN a.parentid
+		is null THEN 'ORG'
+		ELSE 'DEPT'
+		END ) as orgtype,nvl(a.parentid,a.orgid)
+		parentid,nvl(a.parentname,a.orgname) parentname,a.status from (select
+		d.*,(select dp.deptname from base_deptment dp where
+		dp.id=d.parentid)
+		parentname,o.organizename orgname from
+		base_deptment d join
+		base_Organize o on d.orgid=o.id) a where a.status is
+		null
+		<if test="orgid!=null and orgid!=''">and a.orgid=#{orgid}</if>
+		<if test="deptname!=null and deptname!=''">
+			a.deptname like '%'||#{deptname}||'%'
+		</if>
+	</select>
+	<!-- 查询单个部门组详细信息 -->
+	<select id="searchOneDepartment" parameterType="String"
+		resultType="com.cabletech.business.entity.information.DepartmentEntity"
+		flushCache="true">
+		select a.id,a.deptname,a.orgid,a.officer,a.remark,(CASE
+		WHEN a.parentid is null THEN 'ORG'
+		ELSE 'DEPT'
+		END ) as
+		orgtype,nvl(a.parentid,a.orgid)
+		parentid,nvl(a.parentname,a.orgname)
+		parentname,a.status from (select
+		d.*,(select dp.deptname from
+		base_deptment dp where
+		dp.id=d.parentid) parentname,o.organizename
+		orgname from
+		base_deptment d join base_Organize o on d.orgid=o.id) a
+		where a.status is
+		null and a.id=#{id,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertDepartment"
+		parameterType="com.cabletech.business.entity.information.DepartmentEntity"
+		flushCache="true">
+		insert into base_deptment (id, deptname, orgid, officer,
+		remark,
+		parentid)values(#{id}, #{deptname,jdbcType=VARCHAR},
+		#{orgid,jdbcType=VARCHAR}, #{officer,jdbcType=VARCHAR},
+		#{remark,jdbcType=VARCHAR}, #{pdeptid,jdbcType=VARCHAR})
+
+	</insert>
+	<!-- 更新数据 -->
+	<update id="updateDepartment"
+		parameterType="com.cabletech.business.entity.information.DepartmentEntity"
+		flushCache="true">
+		update base_deptment set deptname =
+		#{deptname,jdbcType=VARCHAR},
+		officer = #{officer,jdbcType=VARCHAR},
+		orgid = #{orgid,jdbcType=VARCHAR},
+		remark =
+		#{remark,jdbcType=VARCHAR},
+		parentid =
+		#{pdeptid,jdbcType=VARCHAR} where id = #{id}
+
+	</update>
+
+	<!-- 逻辑删除单个部门信息 -->
+	<update id="deleteDepartment" flushCache="true">
+		update base_deptment set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>

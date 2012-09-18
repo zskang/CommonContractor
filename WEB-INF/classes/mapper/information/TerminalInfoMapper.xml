@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.information.TerminalInfoMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	-->
+
+	<!-- 查询全部设备信息 -->
+	<select id="searchAllTerminalInfo" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.TerminalInfoEntity"
+		flushCache="true">
+			select t.*,o.organizename as orgname,p.patrolgroupname as patrolgroupname from terminalinfo t
+ 				left join base_organize o on t.orgid = o.id
+ 				left join patrolgroup p on t.patrolgroupid = p.id 
+			where  t.status is null 
+		    <if test="deviceid!=null and deviceid!=''">
+			     AND t.deviceid like '%'||#{deviceid}||'%'
+		    </if>
+	</select>
+	
+	
+	<!-- 查询全部未绑定维护组的设备信息 -->
+	<select id="searchAllTerminalInfoNoPatrolGroup" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.TerminalInfoEntity"
+		flushCache="true">
+			select t.*,o.organizename as orgname,p.patrolgroupname as patrolgroupname from terminalinfo t
+ 			left join base_organize o on t.orgid = o.id
+ 			left join patrolgroup p on t.patrolgroupid = p.id 
+			where  t.status is null and t.patrolgroupid is null 
+		    <if test="deviceid!=null and deviceid!=''">
+			     AND t.deviceid like '%'||#{deviceid}||'%'
+		    </if>
+	</select>
+	
+	
+	<!-- 查询维护组绑定的设备信息 -->
+	<select id="searchAllTerminalInfoByPatrolGroup" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.TerminalInfoEntity"
+		flushCache="true">
+			select t.*,o.organizename as orgname,p.patrolgroupname as patrolgroupname from terminalinfo t
+ 			left join base_organize o on t.orgid = o.id
+ 			left join patrolgroup p on t.patrolgroupid = p.id 
+			where  t.status is null  and t.patrolgroupid is not null 
+		    <if test="patrolgroupid!=null and patrolgroupid!=''">
+			     and t.patrolgroupid = #{patrolgroupid}
+		    </if>
+		    <if test="deviceid!=null and deviceid!=''">
+			     AND t.deviceid like '%'||#{deviceid}||'%'
+		    </if>
+	</select>
+	
+	
+	<!-- 查询未使用的SIM卡 -->
+	<select id="searchAllSimNoTerminalInfo" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.SimCardEntity"
+		flushCache="true">
+			select t.* from siminfo t where t.simcode not in (select s.simid from terminalinfo s where s.simid is not null) 
+			and  t.status is null
+	</select>
+
+
+	<!-- 查询单个设备信息 -->
+	<select id="searchOneTerminalInfo" parameterType="String"
+		resultType="com.cabletech.business.entity.information.TerminalInfoEntity"
+		flushCache="true">
+			select * from terminalinfo where status is null and id = #{id}
+	</select>
+
+
+	<!-- 插入设备信息 -->
+	<insert id="insertTerminalInfo"
+		parameterType="com.cabletech.business.entity.information.TerminalInfoEntity"
+		flushCache="true">
+			insert into terminalinfo(id,devicetype,deviceid,factory,producedate,buydate,simid,orgid,patrolgroupid) 
+			values(#{id,jdbcType=VARCHAR},
+			#{devicetype,jdbcType=VARCHAR},
+			#{deviceid,jdbcType=VARCHAR},
+			#{factory,jdbcType=VARCHAR},
+			#{producedate,jdbcType=DATE},
+			#{buydate,jdbcType=DATE},
+			#{simid,jdbcType=VARCHAR},
+			#{orgid,jdbcType=VARCHAR},
+			#{patrolgroupid,jdbcType=VARCHAR})
+	</insert>
+	
+	
+	<!-- 更新设备信息 -->
+	<update id="updateTerminalInfo"
+		parameterType="com.cabletech.business.entity.information.TerminalInfoEntity"
+		flushCache="true">
+			update terminalinfo set
+			devicetype = #{devicetype,jdbcType=VARCHAR},
+			deviceid = #{deviceid,jdbcType=VARCHAR},
+			factory = #{factory,jdbcType=VARCHAR},
+			producedate = #{producedate,jdbcType=DATE},
+			buydate = #{buydate,jdbcType=DATE},
+			simid = #{simid,jdbcType=VARCHAR}
+		where id=#{id}
+	</update>
+	
+	
+	<!-- 更新设备信息  绑定维护组 -->
+	<update id="updateTerminalInfoForPatrolGroup" parameterType="hashmap">
+		update terminalinfo set patrolgroupid=#{id} where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+
+	<!-- 逻辑删除设备信息 -->
+	<update id="deleteTerminalInfo" flushCache="true">
+		update terminalinfo set status='9' where id in  
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>

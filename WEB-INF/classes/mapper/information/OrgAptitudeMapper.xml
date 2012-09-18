@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.information.OrgAptitudeMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	-->
+
+	<!-- 查询全部资质信息 -->
+	<select id="searchAllOrgAptitude" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.information.OrgAptitudeEntity"
+		flushCache="true">
+			select t.*,o.organizename as orgname,s1.lable as aptitudetypename,s2.lable as aptitudegradename, 
+			substr(add_months(t.grantdate,t.validity)-sysdate,0,2) as overdue 
+			from orgaptitude t 
+			left join base_organize o on t.orgid = o.id 
+      		left join base_sysdictionary s1 on t.aptitudetype = s1.id 
+       		left join base_sysdictionary s2 on t.aptitudegrade = s2.id 
+			where t.status is null 
+		    <if test="aptitudename!=null and aptitudename!=''">
+			     AND t.aptitudename like '%'||#{aptitudename}||'%'
+		    </if>
+	</select>
+
+	<!-- 查询单个资质信息 -->
+	<select id="searchOneOrgAptitude" parameterType="String"
+		resultType="com.cabletech.business.entity.information.OrgAptitudeEntity"
+		flushCache="true">
+			select t.*,o.organizename as orgname from orgaptitude t 
+			left join base_organize o on t.orgid = o.id
+			where t.status is null and t.id = #{id}
+	</select>
+
+	<!-- 插入资质信息 -->
+	<insert id="insertOrgAptitude"
+		parameterType="com.cabletech.business.entity.information.OrgAptitudeEntity"
+		flushCache="true">
+			insert into orgaptitude(id,orgid,aptitudetype,aptitudegrade,aptitudename,aptitudeno,grantdate,validity,certifyorg) 
+			values(#{id,jdbcType=VARCHAR},
+			#{orgid,jdbcType=VARCHAR},
+			#{aptitudetype,jdbcType=VARCHAR},
+			#{aptitudegrade,jdbcType=VARCHAR},
+			#{aptitudename,jdbcType=DATE},
+			#{aptitudeno,jdbcType=DATE},
+			#{grantdate,jdbcType=DATE},
+		    #{validity,jdbcType=INTEGER},
+			#{certifyorg,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 更新资质信息 -->
+	<update id="updateOrgAptitude"
+		parameterType="com.cabletech.business.entity.information.OrgAptitudeEntity"
+		flushCache="true">
+		update orgaptitude set
+		orgid=#{orgid,jdbcType=VARCHAR},
+		aptitudetype=#{aptitudetype,jdbcType=VARCHAR},
+		aptitudegrade=#{aptitudegrade,jdbcType=VARCHAR},
+		aptitudename=#{aptitudename,jdbcType=VARCHAR},
+		aptitudeno=#{aptitudeno,jdbcType=VARCHAR},
+		grantdate=#{grantdate,jdbcType=DATE},
+		validity=#{validity,jdbcType=INTEGER},
+		certifyorg=#{certifyorg,jdbcType=VARCHAR}
+		where id=#{id}
+	</update>
+
+	<!-- 逻辑删除资质信息 -->
+	<update id="deleteOrgAptitude" flushCache="true">
+		update orgaptitude set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+</mapper>

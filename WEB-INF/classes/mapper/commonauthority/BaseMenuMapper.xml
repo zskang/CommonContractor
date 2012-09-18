@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BaseMenuMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 查询全部目录数据 -->
+	<select id="searchAllMenu" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity"
+		flushCache="true">
+		select m.*,(select mp.text from base_menu mp where
+		mp.id=m.parentid) parentname,(select count(1) from base_menu b
+		where b.parentid=m.id and b.status is null ) childcount from base_menu m where
+		m.status is null
+		<if test="parentid!=null and parentid!=''">
+			and m.parentid=#{parentid}
+		</if>
+		<if test="text!=null and text!=''">
+		 and m.text like '%'||#{text}||'%'
+		</if>
+		order by m.ORDERNUM
+	</select>
+
+	<!-- 查询目录数据-->
+	<select id="searchAllMenuforPid" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity"
+		flushCache="true">
+		select * from (select distinct m.*,(select mp.text from menu mp
+		where mp.id=m.parentid) parentname from menu m start with m.id
+		in (select r.menuid from rolemenu r join roleusergroup rg on
+		r.roleid=rg.roleid join usergourpuserlist ug on
+		rg.usergroupid=ug.usergroupid join userinfo u on ug.userid=u.id
+		where u.id=#{userid}) connect by prior m.parentid=m.id)
+		<where>
+			<if test="parentid!=null and parentid!=''">
+				and parentid=#{parentid}
+			</if>
+		</where>
+		order by ORDERNUM
+	</select>
+	<!-- 查询单个目录 -->
+	<select id="searchOneMenu" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.BaseMenuEntity"
+		flushCache="true">
+		select m.*,(select mp.text from base_menu mp where
+		mp.id=m.parentid) parentname from base_menu m where m.status is
+		null and m.id = #{id}
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertOneMenu"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseMenuEntity"
+		flushCache="true">
+		insert into base_menu (id, text, iconcls, hrefurl, itemcls,
+		description, status, parentid,leaf,appclass,ORDERNUM) values
+		(#{id}, #{text,jdbcType=VARCHAR}, #{iconcls,jdbcType=VARCHAR},
+		#{hrefurl,jdbcType=VARCHAR}, #{itemcls,jdbcType=VARCHAR},
+		#{description,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+		#{parentid,jdbcType=VARCHAR}, '1',
+		#{appclass,jdbcType=VARCHAR},#{ordernum})
+	</insert>
+	<!-- 更新数据 -->
+	<update id="updateMenu"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseMenuEntity"
+		flushCache="true">
+		update base_menu set text = #{text,jdbcType=VARCHAR}, iconcls =
+		#{iconcls,jdbcType=VARCHAR}, hrefurl =
+		#{hrefurl,jdbcType=VARCHAR}, itemcls =
+		#{itemcls,jdbcType=VARCHAR}, description =
+		#{description,jdbcType=VARCHAR}, status =
+		#{status,jdbcType=VARCHAR}, parentid =
+		#{parentid,jdbcType=VARCHAR},appclass=#{appclass,jdbcType=VARCHAR},
+		ordernum=#{ordernum} where id = #{id}
+	</update>
+	<!-- 更新数据 -->
+	<update id="updateMenuLeaf"
+		parameterType="String"
+		flushCache="true">
+		update base_menu set leaf='0' where id =
+		#{id}
+	</update>
+	<!-- 逻辑删除单个角色信息 -->
+	<update id="deleteMenu" flushCache="true">
+		update base_menu set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+	<delete id="deleteMenuResource" parameterType="String">
+		delete from base_permissionscope where resourcecategory='Menu'
+		and targetcategory='Resource' and resourceid=#{menuid}
+	</delete>
+	<insert id="insertMenuResource"
+		parameterType="com.cabletech.business.entity.commonauthority.BasePermissionScopeEntity"
+		flushCache="true">
+		insert into base_permissionscope(id,
+		resourceid,resourcecategory, targetid,
+		targetcategory)values(#{id,jdbcType=VARCHAR},#{resourceid,jdbcType=VARCHAR},#{resourcecategory,jdbcType=VARCHAR},#{targetid,jdbcType=VARCHAR},#{targetcategory,jdbcType=VARCHAR})
+	</insert>
+</mapper>

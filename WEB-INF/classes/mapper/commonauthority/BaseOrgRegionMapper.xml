@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BaseOrgRegionMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+
+
+	<!-- 查询全部区域数据 -->
+	<select id="searchAllOrganizeRegion" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseOrgRegionEntity"
+		flushCache="true">
+		select distinct c.*,(select count(1) from base_region b
+		where
+		b.parentid=c.regionid)count from(select r.regionid
+		regionid,r.regionname,o.orgid,r.parentid pregionid from base_region r
+		left join base_orgregion o on r.regionid=o.regionid where
+		o.orgid=#{orgid,jdbcType=VARCHAR} and
+		r.parentid=#{regionid,jdbcType=VARCHAR} union all select r.regionid
+		regionid,r.regionname,null orgid,r.parentid pregionid from
+		base_region
+		r where not exists(select 1 from base_orgregion o where
+		o.id=r.regionid and o.orgid=#{orgid,jdbcType=VARCHAR}) and
+		r.parentid=#{regionid,jdbcType=VARCHAR} and r.status is null)c
+	</select>
+
+	<!-- 查询全部区域数据根据orgid -->
+	<select id="searchAllOrganizeRegionForOid" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseOrgRegionEntity"
+		useCache="false">
+		select ro.*,o.organizename,r.regionname from base_orgregion ro join
+		base_organize o on ro.orgid=o.id join base_region r on
+		ro.regionid=r.regionid
+		where o.status is null and r.status is null
+		<if test="orgid!=null and orgid!=''">
+			and ro.orgid in(select id from base_organize start with id=
+			#{orgid} connect by prior id=parentid)
+			</if>
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertOrganizeRegion"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseOrgRegionEntity"
+		flushCache="true">
+		insert into base_orgregion (id, orgid, regionid) values
+		(#{id,jdbcType=VARCHAR}, #{orgid,jdbcType=VARCHAR},
+		#{regionid,jdbcType=VARCHAR})
+	</insert>
+	<!-- 更新数据 -->
+	<update id="deleteOrganizeRegion" flushCache="true">
+		delete from base_orgregion where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+	<!-- 更新数据 -->
+	<update id="deleteOrgRegionRel"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseOrgRegionEntity"
+		flushCache="true">
+		delete from base_orgregion where
+		orgid=#{orgid,jdbcType=VARCHAR} and
+		regionid=#{regionid,jdbcType=VARCHAR}
+	</update>
+</mapper>

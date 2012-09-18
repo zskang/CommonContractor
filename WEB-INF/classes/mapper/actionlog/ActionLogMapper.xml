@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper
+	namespace="com.cabletech.business.mapper.actionlog.ActionLoggerMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+	<cache type="org.mybatis.ehcache.LoggingEhcache" />
+	<!-- 查询全部用户数据 -->
+	<select id="searchActionLogger" parameterType="hashmap"
+		resultType="hashmap">
+		select a.id,u.username
+		userid,to_char(a.actdate,'yyyy-mm-dd hh24:mi:ss') actdate,a.actclass,a.actmethod,a.recordid,a.actip from
+		useractionlog a,userinfo u where a.userid=u.userid and u.state
+		is null
+		<if test="startdate!=null and enddate != null">
+			and a.actdate between to_date(#{startdate},'yyyy-mm-dd
+			hh24:mi:ss') and to_date(#{enddate},'yyyy-mm-dd hh24:mi:ss')
+		</if>
+		<if test="userid!=null">and a.userid=#{userid}</if>
+	</select>
+
+
+	<insert id="insertActionLogger"
+		parameterType="com.cabletech.business.entity.actionlog.ActionLoggerEntity"
+		flushCache="true">
+		insert into
+		useractionlog(id,userid,actclass,actmethod,actmethodname,recordid,actip)
+		values(#{id},#{userid,jdbcType=VARCHAR},#{actclass,jdbcType=VARCHAR},#{actmethod,jdbcType=VARCHAR},#{actmethodname,jdbcType=VARCHAR},#{recordid,jdbcType=VARCHAR},#{actip,jdbcType=VARCHAR})
+	</insert>
+
+</mapper>
+

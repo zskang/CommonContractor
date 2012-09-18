@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.cabletech.business.mapper.commonauthority.BaseOrganizeMapper">
+	<!--<cache type="org.mybatis.caches.ehcache.EhcacheCache" /> <cache type="org.mybatis.ehcache.LoggingEhcache" 
+		/> -->
+
+	<!-- 查询全部组织机构数据 -->
+	<select id="searchAllOrganize" parameterType="hashmap"
+		resultType="com.cabletech.business.entity.commonauthority.BaseOrganizeEntity"
+		flushCache="true">
+		select o.*,(select organizename from base_organize where
+		o.parentid=id) parentname,(select count(1) from base_organize b
+		where b.parentid=o.id and b.status is null) childcount,FN_GETNAMEBYCODE(o.orgtype,'orgtype') as orgtypelabel,FN_GETREGIONNAME(O.REGIONID) AS REGIONNAME from base_organize o 
+    	where o.status is null
+		<if test="orgtype!=null and orgtype!=''">
+			AND o.orgtype= #{orgtype}
+		</if>
+		<if test="id!=null and id!=''">
+			AND o.id in(select id from base_organize start with id=
+			#{id} connect by prior id=parentid)
+		</if>
+		<if test="orgname!=null and orgname!=''">
+			AND o.organizename like
+			'%'||#{orgname}||'%'
+		</if>
+		<if test="pid!=null and pid!=''">AND o.parentid=#{pid}</if>
+		<if test="pid==null and pid==''">AND o.parentid is null</if>
+		<if test="type!=null and type!=''">and o.id!=#{id}</if>
+	</select>
+
+	<!-- 查询单个组织机构组信息 -->
+	<select id="searchOneOrganize" parameterType="String"
+		resultType="com.cabletech.business.entity.commonauthority.BaseOrganizeEntity"
+		flushCache="true">
+		select o.*,(select organizename from base_organize where
+		o.parentid=id) parentname,FN_GETREGIONNAME(O.REGIONID) AS regionname from base_organize o where o.status is
+		null
+		and id = #{id}
+	</select>
+
+	<!-- 插入数据 -->
+	<insert id="insertOrganize"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseOrganizeEntity"
+		flushCache="true">
+		insert into
+		base_organize(id,organizename,linkmaninfo,parentid,remark,orgtype,linkmantel,regionid)
+		values(#{id},#{organizename,jdbcType=VARCHAR},#{linkmaninfo,jdbcType=VARCHAR},#{parentid,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR},#{orgtype,jdbcType=VARCHAR}
+		,#{linkmantel,jdbcType=VARCHAR},#{regionid,jdbcType=VARCHAR}
+		)
+	</insert>
+	<!-- 更新数据 -->
+	<update id="updateOrganize"
+		parameterType="com.cabletech.business.entity.commonauthority.BaseOrganizeEntity"
+		flushCache="true">
+		update base_organize set
+		organizename=#{organizename,jdbcType=VARCHAR},linkmaninfo=#{linkmaninfo,jdbcType=VARCHAR},parentid=#{parentid,jdbcType=VARCHAR},remark=#{remark,jdbcType=VARCHAR},orgtype=#{orgtype,jdbcType=VARCHAR}
+		,linkmantel=#{linkmantel,jdbcType=VARCHAR},regionid=#{regionid,jdbcType=VARCHAR}  
+		where id=#{id}
+	</update>
+
+	<!-- 逻辑删除单个组织机构信息 -->
+	<update id="deleteOrganize" flushCache="true">
+		update base_organize set status='9' where id in
+		<foreach collection="array" item="ids" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</update>
+	
+	<!-- 获取节点的父节点ID  add wangjie 2011-11-09 -->
+	<select id="searchOrganizeParentId" parameterType="String"
+		resultType="String"
+		flushCache="true">
+		select t.parentid from base_organize t where t.id = #{id}
+	</select>
+</mapper>

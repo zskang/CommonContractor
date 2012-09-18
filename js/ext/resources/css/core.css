@@ -1,0 +1,180 @@
+.dd-arrow-down.dd-arrow-down-invisible {
+	display: none;
+	visibility: hidden;
+}
+.dd-arrow-down {
+	background-image: url(../images/core/dd-arrow-down.gif);
+	display: block;
+	visibility: visible;
+	z-index: 20000;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	top: 0;
+	left: 0;
+}
+.x-form-trigger.search {
+	border:none;
+	background: url(../images/core/search.png) no-repeat center center!important;
+}
+/************************************************icon********************************************/
+.refresh{
+	background: url("../images/core/refresh.gif") no-repeat !important;
+}
+.connect{
+	background: url("../images/core/connect.png") no-repeat !important;
+}
+.view{
+	background: url("../images/core/view.png") no-repeat !important;
+}
+
+.reset{
+	background: url("../images/icons/arrow_undo.png") no-repeat !important;
+	
+}
+
+.upload-icon {
+	background: url(../images/core/upload.png) no-repeat 3px 3px
+		!important;
+}
+
+.relating {
+	background: url( ../images/core/icons.gif) no-repeat -3px -340px
+		!important;
+}
+
+.save {
+	background: url(../images/core/save.png) no-repeat 0 2px !important;
+}
+.reset{
+	
+}
+
+.clean {
+	background: url(../images/core/exit.png) no-repeat 0 2px !important;
+}
+
+.auditing {
+	background: url(../images/core/auditing.png) no-repeat 0 2px
+		!important;
+}
+
+.recycle {
+	background: url(../images/core/recycle.png) no-repeat 0 2px
+		!important;
+}
+
+.review {
+	background: url(../images/core/review.gif) no-repeat 0 2px
+		!important;
+}
+
+.excel {
+	background: url(../images/core/excel.png) no-repeat 0 2px !important
+		;
+}
+
+.add {
+	background: url(../images/core/add.png) no-repeat 0 1px !important;
+}
+
+.edit {
+	background: url(../images/core/edit.png) no-repeat 0 1px !important;
+}
+
+.view {
+	background: url(../images/core/view.png) no-repeat 0 1px !important;
+}
+.down {
+	background: url(../images/core/down.gif) no-repeat 0 1px !important;
+}
+.pic {
+	background: url(../images/core/picture.png) no-repeat 0 1px !important;
+}
+
+.f5 {
+	background: url(../images/core/f5.png) no-repeat 0 1px !important;
+}
+
+.delete {
+	background: url(../images/core/delete.png) no-repeat 0 1px
+		!important;
+}
+
+.search {
+	background: url(../images/core/search.png) no-repeat 0 2px
+		!important;
+}
+
+.search-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -1px
+		!important;
+}
+
+.search-icon2 {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -1px
+		!important;
+}
+
+.advance-search-icon {
+	background: url( ../images/core/icons.gif) no-repeat -3px -736px
+		!important;
+}
+
+.intro {
+	background: url(../images/core/intro.png) no-repeat 0 2px !important
+		;
+}
+
+.export-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -403px
+		!important;
+}
+
+.import-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -307px
+		!important;
+}
+
+.print-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -773px
+		!important;
+}
+
+.remove-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -202px
+		!important;
+}
+
+.confirm-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -272px
+		!important;
+}
+
+.signContract-icon {
+	background: url( ../images/core/icons.gif ) no-repeat -3px -109px
+		!important;
+}
+.srsearch {
+	background: url(../images/core/srsearch.gif) no-repeat 0 2px
+		!important;
+}
+.move {
+	background: url(../images/core/move.png) no-repeat 0 1px
+		!important;
+}
+.chart {
+	background: url(../images/core/chart_bar.png) no-repeat 0 1px
+		!important;
+}
+.chartPic {
+	background: url(../images/core/chart_pie.png) no-repeat 0 1px
+		!important;
+}
+.magnifier{
+	background: url(../images/core/zoom.png) no-repeat 0 1px!important;
+}
+.chartPic-icon {
+	background: url(../images/core/chart_pie.png) no-repeat 0 5px
+		!important;
+}
